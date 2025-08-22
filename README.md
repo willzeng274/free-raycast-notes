@@ -6,7 +6,7 @@ A free, open-source alternative to Raycast Notes Pro built with Tauri and React.
 
 ## Demo
 
-![Free Raycast Notes Demo](free_raycast_notes.gif)
+https://github.com/user-attachments/assets/7d5a2704-f0b6-400e-ad42-b76f1e158d07
 
 ## Features
  
