@@ -55,6 +55,9 @@
   }
   html, body {
     background-color: transparent !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
   }
   body {
     @apply bg-background text-foreground;
@@ -62,4 +65,41 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  #root {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Force zero spacing for bullet points */
+.ProseMirror ul li,
+.ProseMirror ol li {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.ProseMirror ul li p,
+.ProseMirror ol li p {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline !important;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  padding-left: 1.5em !important;
+}
+
+.ProseMirror ul ul,
+.ProseMirror ol ol,
+.ProseMirror ul ol,
+.ProseMirror ol ul {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-left: 1.5em !important;
 }

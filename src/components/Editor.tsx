@@ -26,7 +26,7 @@ export function Editor({ content, onChange }: EditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-p:my-1 prose-li:my-0 focus:outline-none max-w-none text-gray-800 dark:text-gray-200 dark:prose-invert',
+        class: 'prose prose-lg prose-p:my-1 prose-li:my-0 prose-ul:my-2 prose-ol:my-2 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 focus:outline-none max-w-none min-h-[calc(100vh-200px)] dark:prose-invert prose-bullets:text-red-500',
       },
     },
   });
@@ -38,8 +38,10 @@ export function Editor({ content, onChange }: EditorProps) {
   }, [content, editor]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-4 scrollbar-thin scrollbar-thumb-gray-300/50 hover:scrollbar-thumb-gray-400/50 scrollbar-track-transparent">
-      <EditorContent editor={editor} />
+    <div className="flex-1 h-full overflow-hidden">
+      <div className="h-full overflow-y-auto px-8 py-6 scrollbar-thin scrollbar-thumb-gray-300/50 hover:scrollbar-thumb-gray-400/50 scrollbar-track-transparent dark:scrollbar-thumb-gray-600/50 dark:hover:scrollbar-thumb-gray-500/50">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

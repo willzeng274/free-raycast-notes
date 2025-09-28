@@ -12,9 +12,9 @@ export function Panel({ children }: PanelProps) {
   };
 
   return (
-    <div className="absolute inset-0 pt-10 pb-10 px-10">
+    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm flex items-start justify-center pt-16 pb-10 px-10 z-50">
       <div
-        className="relative mx-auto w-full max-w-[44rem] bg-[#F6F6F6] dark:bg-[#2A2A2A] rounded-2xl shadow-xl shadow-black/15 dark:shadow-black/40 overflow-hidden"
+        className="relative w-full max-w-[44rem] max-h-[500px] bg-white/95 dark:bg-[#2A2A2A]/95 backdrop-blur-md rounded-2xl shadow-xl shadow-black/15 dark:shadow-black/40 overflow-hidden border border-gray-200/50 dark:border-gray-700/50"
         onClick={handlePanelClick}
       >
         {children}

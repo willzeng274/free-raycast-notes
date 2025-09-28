@@ -44,8 +44,8 @@ interface SearchOverlayContentProps {
   onClose: () => void;
 }
 
-export function SearchOverlayContent({ 
-  notes, 
+export function SearchOverlayContent({
+  notes,
   currentNote,
   onSelectNote,
   onDeleteNote,
@@ -98,9 +98,9 @@ export function SearchOverlayContent({
   }, [search]);
 
   return (
-    <>
+    <div className="flex flex-col max-h-[500px]">
       {/* Search Input */}
-      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -111,7 +111,7 @@ export function SearchOverlayContent({
       </div>
 
       {/* Notes List */}
-      <div className="max-h-[400px] overflow-y-auto">
+      <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300/50 hover:scrollbar-thumb-gray-400/50 scrollbar-track-transparent dark:scrollbar-thumb-gray-600/50 dark:hover:scrollbar-thumb-gray-500/50 min-h-0 max-h-[400px]">
         {filteredNotes.length === 0 ? (
           <div className="p-8 text-center">
             <FileText className="w-8 h-8 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
@@ -125,7 +125,7 @@ export function SearchOverlayContent({
                   <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">Pinned</span>
                 </div>
                 {pinnedNotes.map((note, index) => (
-                  <NoteItem 
+                  <NoteItem
                     key={note.id}
                     note={note}
                     isSelected={selectedIndex === index}
@@ -149,7 +149,7 @@ export function SearchOverlayContent({
                   </div>
                 </div>
                 {unpinnedNotes.map((note, index) => (
-                  <NoteItem 
+                  <NoteItem
                     key={note.id}
                     note={note}
                     isSelected={selectedIndex === pinnedNotes.length + index}
@@ -164,7 +164,7 @@ export function SearchOverlayContent({
           </>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -239,11 +239,10 @@ interface NoteItemProps {
 function NoteItem({ note, isSelected, isCurrent, onSelect, onPinNote, onDeleteNote }: NoteItemProps) {
   return (
     <div
-      className={`group relative cursor-pointer transition-colors ${
-        isSelected 
-          ? 'bg-gray-200/70 dark:bg-gray-700/50' 
-          : 'hover:bg-gray-100/50 dark:hover:bg-gray-800/30'
-      }`}
+      className={`group relative cursor-pointer transition-colors ${isSelected
+        ? 'bg-gray-200/70 dark:bg-gray-700/50'
+        : 'hover:bg-gray-100/50 dark:hover:bg-gray-800/30'
+        }`}
       onClick={onSelect}
     >
       <div className="flex items-center gap-3 px-3 py-2">
@@ -257,14 +256,17 @@ function NoteItem({ note, isSelected, isCurrent, onSelect, onPinNote, onDeleteNo
             </h3>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
-            {isCurrent && (
+            {isCurrent ? (
               <>
                 <span className="text-red-500">Current</span>
                 <span className="text-gray-400 dark:text-gray-500">•</span>
               </>
+            ) : (
+              <>
+                <span>{`Opened ${getTimeAgo(note.updatedAt)}`}</span>
+                <span className="text-gray-400 dark:text-gray-500">•</span>
+              </>
             )}
-            <span>Opened {getTimeAgo(note.updatedAt)}</span>
-            <span className="text-gray-400 dark:text-gray-500">•</span>
             <span>{getCharacterCount(note.content).toLocaleString()} Characters</span>
           </div>
         </div>

@@ -95,13 +95,30 @@ module.exports = {
               fontSize: '1rem',
             },
             ul: {
-              marginTop: '0.6em',
-              marginBottom: '0.6em',
+              marginTop: '0.5em',
+              marginBottom: '0.5em',
+              paddingLeft: '1.5em',
+            },
+            'ul ul, ol ol, ul ol, ol ul': {
+              marginTop: '0',
+              marginBottom: '0',
+              paddingLeft: '1.5em',
             },
             li: {
-              marginTop: '0.1em',
-              marginBottom: '0.1em',
+              marginTop: '0',
+              marginBottom: '0',
+              paddingTop: '0',
+              paddingBottom: '0',
               lineHeight: '1.5',
+            },
+            'li > p': {
+              marginTop: '0',
+              marginBottom: '0',
+              paddingTop: '0',
+              paddingBottom: '0',
+            },
+            'li + li': {
+              marginTop: '0',
             },
             'li::marker': {
               color: 'var(--tw-prose-bullets)',

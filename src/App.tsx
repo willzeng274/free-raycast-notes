@@ -7,6 +7,7 @@ import { SearchOverlayContent } from './components/SearchPanelContent';
 import { Type } from 'lucide-react';
 import { Editor } from './components/Editor';
 import { Panel } from './components/Panel';
+import { FindInNote } from './components/FindInNote';
 import { useScreenSharingVisibility } from './hooks/useScreenSharingVisibility';
 import "./index.css";
 
@@ -24,6 +25,7 @@ function App() {
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [content, setContent] = useState('');
   const [activePanel, setActivePanel] = useState<'commands' | 'search' | null>(null);
+  const [showFindInNote, setShowFindInNote] = useState(false);
   const { isVisible: screenSharingVisible, toggleVisibility: toggleScreenSharing } = useScreenSharingVisibility();
 
   const getTitleFromContent = (htmlContent: string) => {
@@ -193,6 +195,12 @@ function App() {
         invoke('hide_panel');
       }
 
+      // Find in Note (⌘+F)
+      if (cmdKey && e.key === 'f') {
+        e.preventDefault();
+        setShowFindInNote(true);
+      }
+
       // Quit App (⌘+Q)
       if (cmdKey && e.key === 'q') {
         e.preventDefault();
@@ -295,11 +303,11 @@ function App() {
   };
 
   const handleFormat = () => {
-    console.log('Format');
+    // Format functionality not implemented
   };
 
   const handleFindInNote = () => {
-    console.log('Find in Note');
+    setShowFindInNote(true);
   };
 
   const [showCharCount, setShowCharCount] = useState(false);
@@ -307,16 +315,18 @@ function App() {
   const charCount = content.replace(/<[^>]*>/g, '').length;
 
   return (
-    <main className="h-screen flex flex-col bg-[#F5F5F5] dark:bg-[#1C1C1C] rounded-xl overflow-hidden shadow-xl shadow-black/10 dark:shadow-black/25">
-      <TitleBar 
+    <main className="h-screen w-screen flex flex-col bg-[#F5F5F5] dark:bg-[#1C1C1C] rounded-xl overflow-hidden shadow-xl shadow-black/10 dark:shadow-black/25 fixed inset-0">
+      <TitleBar
         title={currentNote ? currentNote.title : 'Raycast Notes'}
         onCommandPalette={() => setActivePanel(activePanel === 'commands' ? null : 'commands')}
         onBrowseNotes={() => setActivePanel(activePanel === 'search' ? null : 'search')}
         onNewNote={handleCreateNote}
         screenSharingVisible={screenSharingVisible}
       />
-      
-      <div className="flex-1 relative overflow-y-hidden">
+
+      <FindInNote isOpen={showFindInNote} onClose={() => setShowFindInNote(false)} />
+
+      <div className="flex-1 relative overflow-hidden">
         <Editor content={content} onChange={setContent} />
 
         {activePanel && (

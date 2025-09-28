@@ -275,8 +275,8 @@ export function CommandPaletteContent({
   }, [search]);
   
   return (
-    <>
-      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+    <div className="flex flex-col max-h-[500px]">
+      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -285,7 +285,7 @@ export function CommandPaletteContent({
           autoFocus
         />
       </div>
-      <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300/50 hover:scrollbar-thumb-gray-400/50 scrollbar-track-transparent">
+      <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300/50 hover:scrollbar-thumb-gray-400/50 scrollbar-track-transparent dark:scrollbar-thumb-gray-600/50 dark:hover:scrollbar-thumb-gray-500/50 min-h-0 max-h-[400px]">
         {commandList.map((group, groupIndex) => (
           <Fragment key={group.heading}>
             {group.commands.length > 0 && groupIndex > 0 && <div className="h-px bg-gray-200/80 dark:bg-gray-700/80 mx-2 my-1" />}
@@ -325,6 +325,6 @@ export function CommandPaletteContent({
           </Fragment>
         ))}
       </div>
-    </>
+    </div>
   );
 }
