@@ -2,12 +2,12 @@ import { Fragment, useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Input } from '@/components/ui/input';
 import { Kbd } from "@/components/ui/kbd";
-import { 
-  Plus, 
-  Copy, 
-  FileText, 
+import {
+  Plus,
+  Copy,
+  FileText,
   Search,
-  ExternalLink, 
+  ExternalLink,
   Upload,
   ArrowUp,
   ArrowDown,
@@ -21,7 +21,8 @@ import {
   RectangleHorizontal,
   Minus,
   Link2,
-  X
+  X,
+  Bot
 } from 'lucide-react';
 
 interface CommandAction {
@@ -55,6 +56,8 @@ interface CommandPaletteProps {
   onClose: () => void;
   screenSharingVisible: boolean;
   onToggleScreenSharing: () => Promise<boolean>;
+  onOpenSettings: () => void;
+  onOpenAIChat: () => void;
 }
 
 export function CommandPaletteContent({
@@ -73,7 +76,9 @@ export function CommandPaletteContent({
   currentNote,
   onClose,
   screenSharingVisible,
-  onToggleScreenSharing
+  onToggleScreenSharing,
+  onOpenSettings,
+  onOpenAIChat
 }: CommandPaletteProps) {
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -219,9 +224,23 @@ export function CommandPaletteContent({
       ]
     },
     {
-      heading: 'Settings',
+      heading: 'AI & Settings',
       commands: [
-        { id: 'open-raycast-notes-settings', label: 'Open Raycast Notes Settings', action: () => {}, shortcut: <><Kbd>⌘</Kbd><Kbd>,</Kbd></>, icon: <Settings className="w-4 h-4" />, disabled: true },
+        {
+          id: 'ai-chat',
+          label: 'AI Chat',
+          action: () => { onOpenAIChat(); },
+          icon: <Bot className="w-4 h-4" />,
+          disabled: false
+        },
+        {
+          id: 'open-raycast-notes-settings',
+          label: 'Raycast Notes Settings',
+          action: () => { onOpenSettings(); },
+          shortcut: <><Kbd>⌘</Kbd><Kbd>,</Kbd></>,
+          icon: <Settings className="w-4 h-4" />,
+          disabled: false
+        },
         { id: 'recently-deleted-notes', label: 'Recently Deleted Notes', action: () => {}, icon: <Trash2 className="w-4 h-4" />, disabled: true },
         {
           id: 'delete-note',

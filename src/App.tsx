@@ -4,6 +4,8 @@ import { invoke } from '@tauri-apps/api/core';
 import { TitleBar } from './components/TitleBar';
 import { CommandPaletteContent } from './components/CommandPaletteContent';
 import { SearchOverlayContent } from './components/SearchPanelContent';
+import { SettingsPanel } from './components/SettingsPanel';
+import { AIChat } from './components/AIChat';
 import { Type } from 'lucide-react';
 import { Editor, EditorRef } from './components/Editor';
 import { Panel } from './components/Panel';
@@ -24,7 +26,7 @@ function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [content, setContent] = useState('');
-  const [activePanel, setActivePanel] = useState<'commands' | 'search' | null>(null);
+  const [activePanel, setActivePanel] = useState<'commands' | 'search' | 'settings' | 'ai-chat' | null>(null);
   const [showFindInNote, setShowFindInNote] = useState(false);
   const { isVisible: screenSharingVisible, toggleVisibility: toggleScreenSharing } = useScreenSharingVisibility();
   const editorRef = useRef<EditorRef>(null);
@@ -313,6 +315,14 @@ function App() {
     setShowFindInNote(true);
   };
 
+  const handleOpenSettings = () => {
+    setActivePanel('settings');
+  };
+
+  const handleOpenAIChat = () => {
+    setActivePanel('ai-chat');
+  };
+
   const [showCharCount, setShowCharCount] = useState(false);
   const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
   const charCount = content.replace(/<[^>]*>/g, '').length;
@@ -333,42 +343,58 @@ function App() {
         <Editor ref={editorRef} content={content} onChange={setContent} />
 
         {activePanel && (
-          <div 
+          <div
             className="absolute inset-0"
-            onClick={() => setActivePanel(null)}
+            onClick={() => {
+              if (activePanel === 'settings' || activePanel === 'ai-chat') return;
+              setActivePanel(null);
+            }}
           >
-            <Panel onClose={() => setActivePanel(null)}>
-              {activePanel === 'search' && (
-                <SearchOverlayContent
-                  notes={notes}
-                  currentNote={currentNote}
-                  onSelectNote={handleSelectNote}
-                  onDeleteNote={handleDeleteNote}
-                  onPinNote={handlePinNote}
-                  onClose={() => setActivePanel(null)}
-                />
-              )}
-              {activePanel === 'commands' && (
-                <CommandPaletteContent
-                  onNewNote={handleCreateNote}
-                  onDuplicateNote={handleDuplicateNote}
-                  onBrowseNotes={() => setActivePanel('search')}
-                  onFindInNote={handleFindInNote}
-                  onCopyNoteAs={handleCopyNoteAsMarkdown}
-                  onCopyDeeplink={handleCopyDeeplink}
-                  onCreateQuicklink={handleCreateQuicklink}
-                  onExport={handleExport}
-                  onMoveListItemUp={handleMoveListItemUp}
-                  onMoveListItemDown={handleMoveListItemDown}
-                  onFormat={handleFormat}
-                  onDeleteNote={handleDeleteCurrentNote}
-                  currentNote={currentNote}
-                  onClose={() => setActivePanel(null)}
-                  screenSharingVisible={screenSharingVisible}
-                  onToggleScreenSharing={toggleScreenSharing}
-                />
-              )}
-            </Panel>
+            {(activePanel === 'settings' || activePanel === 'ai-chat') ? (
+              <div className="absolute inset-0 bg-[#F5F5F5] dark:bg-[#1C1C1C] z-50">
+                {activePanel === 'settings' && (
+                  <SettingsPanel onBack={() => setActivePanel(null)} />
+                )}
+                {activePanel === 'ai-chat' && (
+                  <AIChat onBack={() => setActivePanel(null)} />
+                )}
+              </div>
+            ) : (
+              <Panel onClose={() => setActivePanel(null)}>
+                {activePanel === 'search' && (
+                  <SearchOverlayContent
+                    notes={notes}
+                    currentNote={currentNote}
+                    onSelectNote={handleSelectNote}
+                    onDeleteNote={handleDeleteNote}
+                    onPinNote={handlePinNote}
+                    onClose={() => setActivePanel(null)}
+                  />
+                )}
+                {activePanel === 'commands' && (
+                  <CommandPaletteContent
+                    onNewNote={handleCreateNote}
+                    onDuplicateNote={handleDuplicateNote}
+                    onBrowseNotes={() => setActivePanel('search')}
+                    onFindInNote={handleFindInNote}
+                    onCopyNoteAs={handleCopyNoteAsMarkdown}
+                    onCopyDeeplink={handleCopyDeeplink}
+                    onCreateQuicklink={handleCreateQuicklink}
+                    onExport={handleExport}
+                    onMoveListItemUp={handleMoveListItemUp}
+                    onMoveListItemDown={handleMoveListItemDown}
+                    onFormat={handleFormat}
+                    onDeleteNote={handleDeleteCurrentNote}
+                    currentNote={currentNote}
+                    onClose={() => setActivePanel(null)}
+                    screenSharingVisible={screenSharingVisible}
+                    onToggleScreenSharing={toggleScreenSharing}
+                    onOpenSettings={handleOpenSettings}
+                    onOpenAIChat={handleOpenAIChat}
+                  />
+                )}
+              </Panel>
+            )}
           </div>
         )}
       </div>

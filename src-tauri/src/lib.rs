@@ -25,7 +25,8 @@ pub fn run() {
             command::close_panel,
             command::quit_app,
             command::set_screen_sharing_visibility,
-            command::get_screen_sharing_visibility
+            command::get_screen_sharing_visibility,
+            command::take_screenshot
         ])
         .plugin(tauri_nspanel::init())
         .setup(move |app| {

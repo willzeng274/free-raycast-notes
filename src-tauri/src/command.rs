@@ -1,5 +1,8 @@
 use tauri::{AppHandle, Manager};
 use tauri_nspanel::ManagerExt;
+use screenshots::Screen;
+use base64::{Engine as _, engine::general_purpose};
+use image::ImageEncoder;
 
 #[cfg(target_os = "macos")]
 use tauri_nspanel::{
@@ -91,5 +94,39 @@ pub fn get_screen_sharing_visibility(handle: AppHandle) -> Result<bool, String> 
   {
     let _ = handle;
     Ok(true)
+  }
+}
+
+#[tauri::command]
+pub fn take_screenshot() -> Result<String, String> {
+  let screens = Screen::all().map_err(|e| format!("Failed to get screens: {}", e))?;
+
+  if let Some(screen) = screens.first() {
+    let image = screen.capture().map_err(|e| format!("Failed to capture screen: {}", e))?;
+
+    // Convert to PNG bytes
+    let mut png_data = Vec::new();
+    let width = image.width();
+    let height = image.height();
+
+    // Create PNG encoder
+    use std::io::Cursor;
+    let mut cursor = Cursor::new(&mut png_data);
+
+    let encoder = image::codecs::png::PngEncoder::new(&mut cursor);
+    let rgba_data: Vec<u8> = image.into_raw();
+
+    encoder.write_image(
+      &rgba_data,
+      width,
+      height,
+      image::ExtendedColorType::Rgba8,
+    ).map_err(|e| format!("Failed to encode PNG: {}", e))?;
+
+    // Convert to base64
+    let base64_string = general_purpose::STANDARD.encode(png_data);
+    Ok(format!("data:image/png;base64,{}", base64_string))
+  } else {
+    Err("No screens found".to_string())
   }
 }
