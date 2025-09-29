@@ -44,7 +44,7 @@ export function TitleBar({ title, onCommandPalette, onBrowseNotes, onNewNote, sc
             </div>
             <div data-tauri-drag-region className="drag-region flex-1 text-center">
                 <div data-tauri-drag-region className="drag-region flex items-center justify-center gap-2">
-                    <span data-tauri-drag-region className="drag-region text-xs font-semibold text-gray-600 dark:text-gray-300 tracking-wide">{title}</span>
+                    <span data-tauri-drag-region className="drag-region text-xs font-semibold text-gray-600 dark:text-gray-300 tracking-wide truncate max-w-48">{title}</span>
                     <TooltipProvider delayDuration={300}>
                         <Tooltip>
                             <TooltipTrigger asChild>

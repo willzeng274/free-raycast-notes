@@ -1,11 +1,11 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { TitleBar } from './components/TitleBar';
 import { CommandPaletteContent } from './components/CommandPaletteContent';
 import { SearchOverlayContent } from './components/SearchPanelContent';
 import { Type } from 'lucide-react';
-import { Editor } from './components/Editor';
+import { Editor, EditorRef } from './components/Editor';
 import { Panel } from './components/Panel';
 import { FindInNote } from './components/FindInNote';
 import { useScreenSharingVisibility } from './hooks/useScreenSharingVisibility';
@@ -27,6 +27,7 @@ function App() {
   const [activePanel, setActivePanel] = useState<'commands' | 'search' | null>(null);
   const [showFindInNote, setShowFindInNote] = useState(false);
   const { isVisible: screenSharingVisible, toggleVisibility: toggleScreenSharing } = useScreenSharingVisibility();
+  const editorRef = useRef<EditorRef>(null);
 
   const getTitleFromContent = (htmlContent: string) => {
     const parser = new DOMParser();
@@ -92,14 +93,10 @@ function App() {
 
   useEffect(() => {
     if (!currentNote) return;
-    
-    const timer = setTimeout(() => {
-      if (content !== currentNote.content) {
-        saveCurrentNote();
-      }
-    }, 1000);
 
-    return () => clearTimeout(timer);
+    if (content !== currentNote.content) {
+      saveCurrentNote();
+    }
   }, [content, currentNote, saveCurrentNote]);
 
   // Save to localStorage whenever notes change
@@ -205,6 +202,12 @@ function App() {
       if (cmdKey && e.key === 'q') {
         e.preventDefault();
         invoke('quit_app');
+      }
+
+      // Hide Panel (Escape)
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        invoke('hide_panel');
       }
     };
 
@@ -324,10 +327,10 @@ function App() {
         screenSharingVisible={screenSharingVisible}
       />
 
-      <FindInNote isOpen={showFindInNote} onClose={() => setShowFindInNote(false)} />
+      <FindInNote isOpen={showFindInNote} onClose={() => setShowFindInNote(false)} editorRef={editorRef} />
 
       <div className="flex-1 relative overflow-hidden">
-        <Editor content={content} onChange={setContent} />
+        <Editor ref={editorRef} content={content} onChange={setContent} />
 
         {activePanel && (
           <div 

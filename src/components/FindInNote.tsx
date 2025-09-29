@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, ChevronUp, ChevronDown } from 'lucide-react';
+import { EditorRef } from './Editor';
 
 interface FindInNoteProps {
   isOpen: boolean;
   onClose: () => void;
+  editorRef: React.RefObject<EditorRef>;
 }
 
-export function FindInNote({ isOpen, onClose }: FindInNoteProps) {
+export function FindInNote({ isOpen, onClose, editorRef }: FindInNoteProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentMatch, setCurrentMatch] = useState(0);
   const [totalMatches, setTotalMatches] = useState(0);
@@ -19,133 +21,49 @@ export function FindInNote({ isOpen, onClose }: FindInNoteProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!searchTerm) {
-      clearHighlights();
+    if (!editorRef.current) return;
+
+    if (!searchTerm.trim()) {
+      editorRef.current.clearSearch();
       setCurrentMatch(0);
       setTotalMatches(0);
       return;
     }
 
-    const matches = highlightMatches(searchTerm);
-    setTotalMatches(matches);
-    if (matches > 0) {
-      setCurrentMatch(1);
-      scrollToMatch(0);
-    } else {
-      setCurrentMatch(0);
-    }
-  }, [searchTerm]);
+    // Search using the extension
+    editorRef.current.searchInEditor(searchTerm.trim());
 
-  const clearHighlights = () => {
-    const editor = document.querySelector('.ProseMirror');
-    if (!editor) return;
+    // Update counts after a brief delay to let the extension process
+    const timeoutId = setTimeout(() => {
+      const results = editorRef.current!.getSearchResults();
+      setTotalMatches(results.total);
+      setCurrentMatch(results.current);
+    }, 50);
 
-    // Remove all existing highlights
-    const highlights = editor.querySelectorAll('.search-highlight');
-    highlights.forEach(highlight => {
-      const parent = highlight.parentNode;
-      if (parent) {
-        parent.replaceChild(document.createTextNode(highlight.textContent || ''), highlight);
-        parent.normalize();
-      }
-    });
-  };
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, editorRef]);
 
-  const highlightMatches = (term: string): number => {
-    clearHighlights();
-
-    const editor = document.querySelector('.ProseMirror');
-    if (!editor || !term) return 0;
-
-    const walker = document.createTreeWalker(
-      editor,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
-
-    const textNodes: Text[] = [];
-    let node;
-    while (node = walker.nextNode()) {
-      textNodes.push(node as Text);
-    }
-
-    let matchCount = 0;
-    const regex = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-
-    textNodes.forEach(textNode => {
-      const text = textNode.textContent || '';
-      const matches = [...text.matchAll(regex)];
-
-      if (matches.length > 0) {
-        const parent = textNode.parentNode;
-        if (!parent) return;
-
-        let lastIndex = 0;
-        const fragment = document.createDocumentFragment();
-
-        matches.forEach((match, index) => {
-          const matchStart = match.index!;
-          const matchEnd = matchStart + match[0].length;
-
-          // Add text before match
-          if (matchStart > lastIndex) {
-            fragment.appendChild(document.createTextNode(text.slice(lastIndex, matchStart)));
-          }
-
-          // Add highlighted match
-          const highlight = document.createElement('span');
-          highlight.className = `search-highlight ${index === 0 ? 'search-highlight-current' : ''}`;
-          highlight.style.backgroundColor = '#fbbf24';
-          highlight.style.color = '#000';
-          highlight.style.borderRadius = '2px';
-          highlight.style.padding = '1px 2px';
-          highlight.textContent = match[0];
-          fragment.appendChild(highlight);
-
-          lastIndex = matchEnd;
-          matchCount++;
-        });
-
-        // Add remaining text
-        if (lastIndex < text.length) {
-          fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
-        }
-
-        parent.replaceChild(fragment, textNode);
-      }
-    });
-
-    return matchCount;
-  };
-
-  const scrollToMatch = (index: number) => {
-    const highlights = document.querySelectorAll('.search-highlight');
-    if (highlights.length === 0) return;
-
-    // Remove current highlight
-    highlights.forEach(h => h.classList.remove('search-highlight-current'));
-
-    // Add current highlight
-    const currentHighlight = highlights[index];
-    if (currentHighlight) {
-      currentHighlight.classList.add('search-highlight-current');
-      (currentHighlight as HTMLElement).style.backgroundColor = '#f59e0b';
-      currentHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
 
   const handleNext = () => {
-    if (totalMatches === 0) return;
-    const nextIndex = currentMatch >= totalMatches ? 1 : currentMatch + 1;
-    setCurrentMatch(nextIndex);
-    scrollToMatch(nextIndex - 1);
+    if (totalMatches === 0 || !editorRef.current) return;
+    editorRef.current.goToNext();
+
+    // Update current match after navigation
+    setTimeout(() => {
+      const results = editorRef.current!.getSearchResults();
+      setCurrentMatch(results.current);
+    }, 10);
   };
 
   const handlePrevious = () => {
-    if (totalMatches === 0) return;
-    const prevIndex = currentMatch <= 1 ? totalMatches : currentMatch - 1;
-    setCurrentMatch(prevIndex);
-    scrollToMatch(prevIndex - 1);
+    if (totalMatches === 0 || !editorRef.current) return;
+    editorRef.current.goToPrevious();
+
+    // Update current match after navigation
+    setTimeout(() => {
+      const results = editorRef.current!.getSearchResults();
+      setCurrentMatch(results.current);
+    }, 10);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -162,9 +80,11 @@ export function FindInNote({ isOpen, onClose }: FindInNoteProps) {
 
   useEffect(() => {
     return () => {
-      clearHighlights();
+      if (editorRef.current) {
+        editorRef.current.clearSearch();
+      }
     };
-  }, []);
+  }, [editorRef]);
 
   if (!isOpen) return null;
 

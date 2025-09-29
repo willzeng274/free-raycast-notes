@@ -103,3 +103,18 @@
   margin-bottom: 0 !important;
   padding-left: 1.5em !important;
 }
+
+/* Search result highlighting */
+.search-result {
+  background-color: #ffeb3b !important;
+  color: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+}
+
+/* Current search result (if extension supports it) */
+.search-result.current {
+  background-color: #fbc02d !important;
+  font-weight: bold !important;
+}
