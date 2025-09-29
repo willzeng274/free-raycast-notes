@@ -30,7 +30,6 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ content, onChange },
       }),
       SearchNReplace.configure({
         searchResultClass: 'search-result',
-        caseSensitive: false,
         disableRegex: false,
       }),
     ],
@@ -65,7 +64,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ content, onChange },
     getSearchResults: () => {
       if (!editor) return { current: 0, total: 0 };
 
-      const storage = editor.storage.searchAndReplace || {};
+      const storage = (editor.storage as any).searchAndReplace || {};
       console.log('Search storage:', storage); // Debug logging
 
       const resultIndex = storage.resultIndex;
